@@ -122,12 +122,12 @@ def main_loop():
         hour = now.hour
 
         # Vor 22 Uhr: schlafen
-        if hour < 16:
+        if hour < 22:
             time.sleep(300)  # 5 Minuten
             continue
 
         # Zwischen 22 und 23 Uhr
-        elif 16 <= hour < 23:
+        elif 22 <= hour < 23:
             win = CountdownWindow(next_countdown)
 
             # Countdown-Stufen reduzieren, wenn Nutzer abbricht
