@@ -6,34 +6,39 @@ import threading
 import subprocess
 import random
 import os
+from languages import get_string
 
 # -----------------------------
-# Konfiguration
+# Configuration
 # -----------------------------
-INITIAL_COUNTDOWN = 15 * 60   # 15 Minuten
-REDUCED_COUNTDOWN = 10 * 60   # 10 Minuten
-MIN_COUNTDOWN = 5 * 60        # 5 Minuten
-ONE_MINUTE = 60               # 1 Minute
+INITIAL_COUNTDOWN = 15 * 60   # 15 minutes
+REDUCED_COUNTDOWN = 10 * 60   # 10 minutes
+MIN_COUNTDOWN = 5 * 60        # 5 minutes
+ONE_MINUTE = 60               # 1 minute
 
 MESSAGES_FILE = "messages.txt"
 
 
 # -----------------------------
-# Sprüche laden
+# Load messages
 # -----------------------------
-def lade_sprueche():
+def load_messages():
     if not os.path.exists(MESSAGES_FILE):
-        return ["Schlaf ist wichtig.", "Morgen wirst du froh sein.", "Geh schlafen, Zukunftsdu dankt dir."]
+        return [
+            get_string("sleep_message"),
+            get_string("future_thanks"),
+            get_string("go_to_sleep"),
+        ]
     with open(MESSAGES_FILE, "r", encoding="utf-8") as f:
-        lines = [l.strip() for l in f.readlines() if l.strip()]
-    return lines or ["Schlaf ist wichtig."]
+        lines = [line.strip() for line in f.readlines() if line.strip()]
+    return lines or [get_string("sleep_message")]
 
 
-MOTIVATION = lade_sprueche()
+MOTIVATION = load_messages()
 
 
 # -----------------------------
-# Shutdown-Funktion
+# Shutdown function
 # -----------------------------
 def shutdown_computer():
     try:
@@ -46,11 +51,11 @@ def shutdown_computer():
         # Linux:
         # subprocess.run(["shutdown", "-h", "now"])
     except Exception as e:
-        print("Shutdown fehlgeschlagen:", e)
+        print(get_string("shutdown_failed"), e)
 
 
 # -----------------------------
-# Countdown-Fenster
+# Countdown window
 # -----------------------------
 class CountdownWindow:
     def __init__(self, countdown_seconds):
@@ -60,7 +65,7 @@ class CountdownWindow:
         self.user_clicked_shutdown = False
 
         self.root = tk.Tk()
-        self.root.title("Zeit zum Schlafen!")
+        self.root.title(get_string("window_title"))
         self.root.attributes("-topmost", True)
         self.root.geometry("420x200")
 
@@ -71,11 +76,11 @@ class CountdownWindow:
         self.progress.pack(pady=10)
 
         # Buttons
-        btn_frame = tk.Frame(self.root)
-        btn_frame.pack(pady=10)
+        button_frame = tk.Frame(self.root)
+        button_frame.pack(pady=10)
 
-        tk.Button(btn_frame, text="Jetzt herunterfahren", command=self.shutdown_now).pack(side="left", padx=10)
-        tk.Button(btn_frame, text="Später", command=self.later).pack(side="left", padx=10)
+        tk.Button(button_frame, text=get_string("shutdown_now"), command=self.shutdown_now).pack(side="left", padx=10)
+        tk.Button(button_frame, text=get_string("later"), command=self.later).pack(side="left", padx=10)
 
         self.root.protocol("WM_DELETE_WINDOW", self.later)
 
@@ -104,7 +109,7 @@ class CountdownWindow:
             time.sleep(1)
             remaining -= 1
 
-        # Countdown abgelaufen → herunterfahren
+        # Countdown expired → shutdown
         if not self.closed_by_user and not self.user_clicked_later:
             shutdown_computer()
 
@@ -112,7 +117,7 @@ class CountdownWindow:
 
 
 # -----------------------------
-# Hauptlogik
+# Main logic
 # -----------------------------
 def main_loop():
     next_countdown = INITIAL_COUNTDOWN
@@ -121,17 +126,17 @@ def main_loop():
         now = datetime.datetime.now()
         hour = now.hour
 
-        # Vor 22 Uhr: schlafen
+        # Before 10 PM: sleep
         if hour < 22:
-            time.sleep(300)  # 5 Minuten
+            time.sleep(300)  # 5 minutes
             continue
 
-        # Zwischen 22 und 23 Uhr
+        # Between 10 PM and 11 PM
         elif 22 <= hour < 23:
-            win = CountdownWindow(next_countdown)
+            window = CountdownWindow(next_countdown)
 
-            # Countdown-Stufen reduzieren, wenn Nutzer abbricht
-            if win.user_clicked_later or win.closed_by_user:
+            # Reduce countdown stages if the user cancels
+            if window.user_clicked_later or window.closed_by_user:
                 if next_countdown == INITIAL_COUNTDOWN:
                     next_countdown = REDUCED_COUNTDOWN
                 elif next_countdown == REDUCED_COUNTDOWN:
@@ -139,12 +144,12 @@ def main_loop():
                 else:
                     next_countdown = ONE_MINUTE
 
-            time.sleep(300)  # 5 Minuten warten
+            time.sleep(300)  # Wait 5 minutes
             continue
 
-        # Ab 23 Uhr: jede Minute
+        # After 11 PM: every minute
         elif hour >= 23:
-            win = CountdownWindow(ONE_MINUTE)
+            window = CountdownWindow(ONE_MINUTE)
             time.sleep(60)
             continue
 
