@@ -48,20 +48,18 @@ protected_screen() {
 
     # Check if the screen session already exists
     if screen -ls | grep -q "[.]${name}[[:space:]]"; then
-        echo "Screen session '$name' already exists. Skipping."
         return 0
     fi
 
     if [ $# -eq 0 ]; then
-        echo "No command provided. Starting empty screen session '$name'."
-        screen -dmS "$name"
+        echo "No command provided. You must provide a command."
+        return 1
     else
-        echo "Starting screen session '$name' with command: $*"
         screen -dmS "$name" "$@"
     fi
 }
 
-protected_screen quack-sleep uvx run quack-sleep-doctor
+protected_screen quack-sleep uvx quack-sleep-doctor
 ```
 
 **Windows**: Here we will use the ps1 script provided in the repository to launch the app. First clone the repository, then run `uv sync` to install it. Lastly, add the start.ps1 to your autostart folder.
