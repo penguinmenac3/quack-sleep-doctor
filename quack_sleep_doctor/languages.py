@@ -26,3 +26,11 @@ CURRENT_LANGUAGE = "de"
 
 def get_string(key):
     return LANGUAGES[CURRENT_LANGUAGE].get(key, key)
+
+
+def set_language(lang_code):
+    global CURRENT_LANGUAGE
+    if lang_code in LANGUAGES:
+        CURRENT_LANGUAGE = lang_code
+    else:
+        raise ValueError(f"Language '{lang_code}' not supported. Only {list(LANGUAGES.keys())} are available.")

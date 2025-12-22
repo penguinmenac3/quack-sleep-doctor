@@ -1,7 +1,14 @@
 [project]
 name = "quack-sleep-doctor"
 version = "0.1.0"
-description = "Add your description here"
+description = "A small utility to remind you to go to sleep."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
+
+[project.scripts]
+quack-sleep-doctor = "quack_sleep_doctor.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
