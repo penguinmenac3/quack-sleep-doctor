@@ -12,11 +12,8 @@ Then, you create a config file in `~/.config/quack-sleep/config.json`.
 ```json
 {
     "language": "de",
-    "time_gentle_reminder": "22:30",
-    "time_strict_reminder": "23:00",
-    "gentle_spacing_minutes": 5,
-    "strict_spacing_minutes": 1,
-    "countdown_initial": 15,
+    "reminder_time": "22:10",
+    "countdown_initial": 20,
     "countdown_reduction": 5,
     "countdown_minimum": 1
 }
